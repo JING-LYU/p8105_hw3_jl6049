@@ -1,0 +1,58 @@
+---
+title: "p8105_hw3_jl6049"
+author: "LYU JING"
+date: "10/14/2021"
+output: github_document
+---
+## Problem 1
+
+```{r}
+library(p8105.datasets)
+data("instacart")
+
+library(tidyverse)
+
+```
+
+```{r}
+instacart %>% 
+  janitor::clean_names()
+
+str(instacart)
+names(instacart)
+count(instacart)
+count(distinct(instacart,user_id))
+
+```
+*The goal is to do some exploration of this dataset. To that end, write a short description of the dataset, noting the size and structure of the data, describing some key variables, and giving illstrative examples of observations. *
+
+The dataset contains `r count(instacart)` observations of products information from online grocery orders of `r count(distinct(instacart,user_id))` distinct Instacart users.
+
+The dataset has 15 columns, including `r names(instacart)`
+
+Every observation means a certain product in a user's order. The observation contains detail information of the product, the order and the user. 
+
+For the product information, it has product id, order in which each product was added to cart, if this prodcut has been ordered by this user in the past, name of the product, aisle of the product with aisle id and department of the product with department id.
+
+For the order information, it has order id, which evaluation set this order belongs in (train only),the order sequence number for this user, the day of the week on which the order was placed, the hour of the day on which the order was placed and days since the last order.
+
+For the user information, it has user id.
+
+
+*How many aisles are there, and which aisles are the most items ordered from?*
+
+
+*Make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered.*
+
+
+*Arrange aisles sensibly, and organize your plot so others can read it.*
+
+
+*Make a table showing the three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged*
+
+*vegetables fruits”. Include the number of times each item is ordered in your table.*
+
+
+*Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week;*
+
+*format this table for human readers (i.e. produce a 2 x 7 table)*
