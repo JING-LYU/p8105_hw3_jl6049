@@ -9,9 +9,7 @@ output: github_document
 ```{r}
 library(p8105.datasets)
 data("instacart")
-
 library(tidyverse)
-
 ```
 
 ```{r}
@@ -109,9 +107,145 @@ instacart %>%
 ```
 
 
+## Problem 2
+
+This problem uses the BRFSS data. DO NOT include this dataset in your local data directory; instead, load the data from the p8105.datasets package.
+
+```{r}
+library(p8105.datasets)
+
+data("brfss_smart2010")
+BRFSS = brfss_smart2010
+```
+
+First, do some data cleaning:
+
+format the data to use appropriate variable names;
+focus on the “Overall Health” topic
+include only responses from “Excellent” to “Poor”
+organize responses as a factor taking levels ordered from “Poor” to “Excellent”
+
+```{r}
+BRFSS = 
+  BRFSS %>% 
+  janitor::clean_names() %>%
+  filter(topic == "Overall Health") %>% 
+  # count(response)     to make sure that "response" include only responses from “Excellent” to “Poor”
+  mutate(response = factor(response, levels = c("Poor", "Fair", "Good", "Very good", "Excellent"))) 
+```
+
+Using this dataset, do or answer the following (commenting on the results of each):
+
+**In 2002, which states were observed at 7 or more locations? What about in 2010?**
+
+```{r}
+BRFSS %>%
+  filter(year == "2002") %>% 
+  count(locationabbr,locationdesc) %>% 
+  group_by(locationabbr) %>%
+  summarize(n_obs = n()) %>% 
+  filter(n_obs > 7)
+
+
+```
+```{r}
+BRFSS %>%
+  filter(year == "2010") %>% 
+  count(locationabbr,locationdesc) %>% 
+  group_by(locationabbr) %>%
+  summarize(n_obs = n()) %>% 
+  filter(n_obs > 7)
+```
+
+
+
+**Construct a dataset that is limited to Excellent responses, and contains, year, state, and a variable that averages the data_value across locations within a state. Make a “spaghetti” plot of this average value over time within a state (that is, make a plot showing a line for each state across years – the geom_line geometry and group aesthetic will help).**
+
+
+
+```{r}
+BRFSS_exc = 
+  BRFSS %>%
+  filter(response == "Excellent") %>% 
+  group_by(year,locationabbr) %>% 
+  summarize(data_value_state_average = mean(data_value, na.rm = TRUE) ) 
+  
+BRFSS_exc %>% 
+  ggplot(aes(x = year, y = data_value_state_average, group = locationabbr, color = locationabbr)) + 
+  geom_line() + 
+  theme(legend.position = "right") 
+  
+# group???
+```
+
+
+**Make a two-panel plot showing, for the years 2006, and 2010, distribution of data_value for responses (“Poor” to “Excellent”) among locations in NY State.**
+
+```{r}
+BRFSS %>%
+  filter(locationabbr == "NY") %>% 
+  filter(year == "2006" | year == "2010") %>% 
+  group_by(year) %>% 
+  ggplot(aes(x = response, y = data_value)) + 
+  geom_boxplot() +
+  facet_grid(~year)
+  
+```
+## Problem 3
+
+Accelerometers have become an appealing alternative to self-report techniques for studying physical activity in observational studies and clinical trials, largely because of their relative objectivity. During observation periods, the devices measure “activity counts” in a short period; one-minute intervals are common. Because accelerometers can be worn comfortably and unobtrusively, they produce around-the-clock observations.
+
+This problem uses five weeks of accelerometer data collected on a 63 year-old male with BMI 25, who was admitted to the Advanced Cardiac Care Center of Columbia University Medical Center and diagnosed with congestive heart failure (CHF). The data can be downloaded here. In this spreadsheet, variables activity.* are the activity counts for each minute of a 24-hour day starting at midnight.
+
+Load, tidy, and otherwise wrangle the data. Your final dataset should include all originally observed variables and values; have useful variable names; include a weekday vs weekend variable; and encode data with reasonable variable classes. Describe the resulting dataset (e.g. what variables exist, how many observations, etc).
+
+```{r}
+accelerometer_data = read_csv("./accel_data.csv")
+names(accelerometer_data)
+
+accelerometer_data=
+  accelerometer_data %>% 
+  janitor::clean_names() %>% 
+  mutate(day_type = ifelse(day == 'Saturday'| day == 'Sunday' ,"weekend" ,"weekday"),
+         day_id = recode(day, 
+                             "Sunday" = '7', "Monday" = '1',"Tuesday" = '2',
+                            "Wednesday" = '3',"Thursday" = '4',"Friday" = '5',"Saturday" ='6')) %>%
+  relocate(day_type)
+
+#how to rename a group of column names? Valid name ? with reasonable variable classes?
+```
+ **Describe the resulting dataset (e.g. what variables exist, how many observations, etc).**
+ There are 1444 variables. It is combined by 1440 variables about the the activity counts for each minute of a 24-hour and 4 other variables including :day_type, week number, day_id in a week and the specific day.
+
+
+
+Traditional analyses of accelerometer data focus on the total activity over the day. Using your tidied dataset, aggregate accross minutes to create a total activity variable for each day, and create a table showing these totals. Are any trends apparent?
+Accelerometer data allows the inspection activity over the course of the day. Make a single-panel plot that shows the 24-hour activity time courses for each day and use color to indicate day of the week. Describe in words any patterns or conclusions you can make based on this graph.
 
 
 
 
+```{r}
+accelerometer_data %>% 
+  gather("minute","value",activity_1:activity_1440) %>% 
+  group_by(day_type,week, day_id, day) %>% 
+  summarise(total_activity = sum(value)) %>% 
+  arrange(week,day_id) %>% 
+  ggplot(aes(x = day_id, y = total_activity, color = week)) + 
+  geom_line() +
+  geom_point() +
+  facet_grid(~week)
+  
+
+  
+```
+```{r}
+accelerometer_data %>% 
+  gather("minute","value",activity_1:activity_1440) %>% 
+  group_by(day_type,week, day_id, day) %>% 
+  ggplot(aes(x = minute, y = value, color = day_id)) + 
+  geom_line() +
+  geom_point()
+```
 
 
