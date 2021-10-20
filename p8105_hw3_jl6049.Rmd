@@ -100,12 +100,12 @@ instacart %>%
 
 3)  Make a table showing the three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”. Include the number of times each item is ordered in your table.
 
-```{r}
+```{r message=FALSE}
 most_popular = 
   instacart %>%
   filter(aisle == "baking ingredients" | aisle == "dog food care" | aisle == "packaged vegetables fruits") %>%
   group_by(aisle, product_name) %>% 
-  summarize(count = n(),.groups = 'drop') %>% 
+  summarize(count = n(),) %>% 
   mutate(order = min_rank(desc(count))) %>% 
   filter(min_rank(desc(count)) < 4) %>% 
   arrange(aisle,order)
@@ -174,7 +174,7 @@ BRFSS2002 = BRFSS %>%
   filter(year == "2002") %>% 
   count(locationabbr,locationdesc) %>% 
   group_by(locationabbr) %>%
-  summarize(n_obs = n(),.groups = 'drop') %>% 
+  summarize(n_obs = n()) %>% 
   filter(n_obs >= 7)
 
 knitr::kable(BRFSS2002)
@@ -182,13 +182,13 @@ knitr::kable(BRFSS2002)
 ```
 *2010:*
 
-```{r}
+```{r message=FALSE}
 BRFSS2010 = 
   BRFSS %>%
   filter(year == "2010") %>% 
   count(locationabbr,locationdesc) %>% 
   group_by(locationabbr) %>%
-  summarize(n_obs = n(),.groups = 'drop') %>% 
+  summarize(n_obs = n()) %>% 
   filter(n_obs >= 7)
 
 knitr::kable(BRFSS2010)
@@ -196,14 +196,14 @@ knitr::kable(BRFSS2010)
 
 2) Construct a dataset that is limited to Excellent responses, and contains, year, state, and a variable that averages the data_value across locations within a state. Make a “spaghetti” plot of this average value over time within a state.
 
-```{r}
+```{r message=FALSE}
 BRFSS_exc = 
   BRFSS %>%
   # limited to Excellent responses
   filter(response == "Excellent") %>% 
   group_by(year,locationabbr) %>% 
   # averages the data_value across locations within a state
-  summarize(data_value_state_average = mean(data_value, na.rm = TRUE),.groups = 'drop' ) 
+  summarize(data_value_state_average = mean(data_value, na.rm = TRUE)) 
 
 # Make a “spaghetti” plot of this average value over time within a state  
 BRFSS_exc %>% 
@@ -220,7 +220,7 @@ BRFSS_exc %>%
 
 3) Make a two-panel plot showing, for the years 2006, and 2010, distribution of data_value for responses (“Poor” to “Excellent”) among locations in NY State.
 
-```{r}
+```{r message=FALSE}
 BRFSS %>%
   filter(locationabbr == "NY") %>% 
   filter(year == "2006" | year == "2010") %>% 
@@ -279,11 +279,11 @@ There are 50,400 observations in total.
 
 **Using tidied dataset, aggregate accross minutes to create a total activity variable for each day, and create a table showing these totals.**
 
-```{r}
+```{r message=FALSE}
 accelerometer_data_total =
   accelerometer_data %>% 
   group_by(week, day_id, day) %>% 
-  summarise(total_activity = sum(value),.groups = 'drop') %>% 
+  summarise(total_activity = sum(value)) %>% 
   arrange(week,day_id) 
 
 knitr::kable(accelerometer_data_total)
