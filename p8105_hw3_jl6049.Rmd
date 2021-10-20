@@ -330,6 +330,7 @@ accelerometer_data %>%
   )
 
 ```
+
 From the plot we can find out that
 
 From the angle of a day:
